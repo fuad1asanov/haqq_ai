@@ -1,74 +1,77 @@
 import streamlit as st
 
 # 1. UI Ayarları
-st.set_page_config(page_title="Haqq.ai | Pro Legal", layout="centered")
+st.set_page_config(page_title="Haqq.ai | Screenshot-to-Appeal", layout="centered")
 
 # 2. Başlıq
 st.title("⚖️ Haqq.ai")
-st.markdown("### Süni İntellektlə Texpasport Tanıma və Şikayət")
-st.info("Texpasportun şəklini yükləyin, məlumatları AI doldursun.")
+st.markdown("### Cərimə Skrinşotunu At, Şikayəti Hazırlayaq")
+st.info("SMS Radar və ya DYP-dən gələn cərimə bildirişinin şəklini yükləyin.")
 
 st.divider()
 
-# 3. OCR Funksiyası (Simulyasiya və İnterfeys)
-st.write("### 📸 1. Məlumatları Avtomatik Doldur")
-uploaded_file = st.file_uploader("Texpasportun şəklini buraya yükləyin və ya çəkin", type=['jpg', 'jpeg', 'png'])
+# 3. Ağıllı Analiz Bölməsi
+st.write("### 📸 1. Şəkli Yükləyin")
+upload_type = st.radio("Yükləyəcəyiniz sənəd növü:", ["SMS Radar / Bildiriş Skrinşotu", "Texpasport Şəkli"])
+uploaded_img = st.file_uploader("Şəkli buraya yükləyin", type=['jpg', 'jpeg', 'png'])
 
-if uploaded_file is not None:
-    with st.spinner('AI şəkildəki məlumatları oxuyur...'):
-        # Burada gələcəkdə real OCR (EasyOCR/Tesseract) modelini qoşacağıq
-        # Hələlik istifadəçiyə prosesi göstərmək üçün demo data doldururuq
-        st.success("✅ Məlumatlar uğurla tanındı!")
-        demo_name = "Əliyev Məmməd"
-        demo_plate = "99-BJ-001"
+# Demo Məlumatlar (Analiz simulyasiyası)
+if uploaded_img:
+    with st.spinner('AI mətni analiz edir və detalları çıxarır...'):
+        st.success("✅ Məlumatlar tapıldı!")
+        if "SMS" in upload_type:
+            # Skrinşotdan gələn təxmini datalar
+            auto_name = "Sürücü" 
+            auto_plate = "99-UP-007"
+            auto_madda = "Maddə 328.1 (Sürət)"
+            auto_reason = "Radarda qeydə alınmış sürət həddi"
+        else:
+            auto_name = "Əliyev Vəli"
+            auto_plate = "77-AA-111"
+            auto_madda = "Seçilməyib"
+            auto_reason = ""
 else:
-    demo_name = ""
-    demo_plate = ""
+    auto_name, auto_plate, auto_madda, auto_reason = "", "", "", ""
 
 st.divider()
 
-# 4. Form və Sürücü Paneli
-st.write("### 📝 2. Şikayət Detalları")
-
+# 4. Dinamik Form
+st.write("### 📝 2. Məlumatları Təsdiqləyin")
 col1, col2 = st.columns(2)
 with col1:
-    name = st.text_input("Ad, Soyad:", value=demo_name, placeholder="Məs: Əli Əliyev")
+    name = st.text_input("Ad, Soyad:", value=auto_name)
+    category = st.text_input("Cərimə Maddəsi:", value=auto_madda)
 with col2:
-    car_plate = st.text_input("Avtomobil nömrəsi:", value=demo_plate, placeholder="Məs: 99-XX-000")
+    plate = st.text_input("Nömrə:", value=auto_plate)
+    event_date = st.date_input("Hadisə tarixi:")
 
-# Genişləndirilmiş Maddə Kitabxanası
-category = st.selectbox("Xəta maddəsini seçin:", [
-    "Maddə 327.1 (Sürət həddinin 10-20 km/saat aşılması) - 10 AZN",
-    "Maddə 328.1 (Sürət həddinin 20-40 km/saat aşılması) - 50 AZN",
-    "Maddə 327.2 (İşıqforun qırmızı işığında keçid) - 60 AZN + 3 Bal",
-    "Maddə 346.1 (Dayanma-durma qaydalarının pozulması) - 20 AZN",
-    "Maddə 329.1 (Təhlükəsizlik kəmərindən istifadə etməmə) - 40 AZN",
-    "Digər xüsusi hal"
-])
+details = st.text_area("Etiraz səbəbiniz (Məs: Texniki xəta, nişan yoxluğu):", value=auto_reason)
 
-details = st.text_area("Haqsızlıq barədə qısa qeydiniz:", placeholder="Məs: Kamera görüntüsündə maşın mənə məxsus deyil...")
-
-# 5. Sənədin Hazırlanması
-if st.button("🚀 PREMİUM ŞİKAYƏT GENERASİYA ET"):
-    if name and car_plate and details:
-        erize_metni = f"""AZƏRBAYCAN RESPUBLİKASI DAXİLİ İŞLƏR NAZİRLİYİ
-DÖVLƏT YOL POLİSİ İDARƏSİNƏ
-
-Müraciət edən: {name}
-Nəqliyyat vasitəsi: {car_plate}
+# 5. Ödəniş və Yükləmə Məntiqi
+if st.button("🚀 ŞİKAYƏT SƏNƏDİNİ GÖSTƏ"):
+    if name and plate and details:
+        st.markdown("---")
+        st.subheader("📄 Hazırlanmış Ərizə (Önbaxış)")
+        
+        preview_text = f"""AZƏRBAYCAN RESPUBLİKASI DYP-nə
+Müraciət edən: {name} ({plate})
 
 ŞİKAYƏT ƏRİZƏSİ
 
-Bildirirəm ki, tərəfimə tətbiq olunmuş {category} üzrə inzibati xəta protokolunu haqsız hesab edirəm. 
+Bildirirəm ki, {event_date} tarixində tərəfimə göndərilən {category} üzrə 
+cərimə bildirişi ilə razı deyiləm. Səbəb: {details}.
 
-Səbəb: {details}
-
-İnzibati Xətalar Məcəlləsinin müvafiq maddələrinə əsasən, işə obyektiv baxılmasını və cərimənin ləğvini xahiş edirəm.
-
-Hörmətlə, {name}"""
-
-        st.success("✅ Peşəkar ərizəniz hazırdır!")
-        st.text_area("Sənədin Önbaxışı:", erize_metni, height=250)
-        st.download_button("📥 Rəsmi Sənədi Yüklə (.txt)", erize_metni, file_name=f"Haqq_AI_{car_plate}.txt")
+İşə yenidən baxılmasını xahiş edirəm."""
+        
+        st.code(preview_text, language="text")
+        
+        # ÖDƏNİŞ TƏKLİFİ
+        st.warning("💰 **Sənədi yükləmək üçün cəmi 1 AZN ödəniş tələb olunur.**")
+        
+        if st.button("💳 İndi Ödə və Yüklə"):
+            st.info("Ödəniş sisteminə yönləndirilir... (Bu hissə real bank API-na qoşulacaq)")
     else:
-        st.error("⚠️ Zəhmət olmasa texpasportu yükləyin və ya xanaları əllə doldurun.")
+        st.error("Zəhmət olmasa şəkli yükləyin və ya məlumatları tamamlayın.")
+
+st.divider()
+st.caption("Haqq.ai - Azərbaycanın ilk mobil hüquq köməkçisi.")
