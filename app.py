@@ -1,72 +1,66 @@
 import streamlit as st
 
-# 1. UI Konfiqurasiyası
-st.set_page_config(page_title="Haqq.ai | Premium Legal Tech", layout="wide")
+# 1. UI Ayarları - Standart Streamlit elementləri ilə
+st.set_page_config(page_title="Haqq.ai | Premium Legal Tech", layout="centered")
 
-# 2. Daha stabil dizayn (Python 3.14 dostu)
-custom_css = """
-<style>
-    .stApp { background-color: #0A192F; color: #E6F1FF; }
-    .main-title { color: #64FFDA; text-align: center; font-size: 40px; font-weight: bold; }
-    .stButton>button {
-        background: #64FFDA;
-        color: #0A192F;
-        border-radius: 10px;
-        font-weight: bold;
-        width: 100%;
-    }
-</style>
-"""
-st.markdown(custom_css, unsafe_allow_value=True)
+# 2. Başlıq və Təqdimat
+st.title("⚖️ Haqq.ai")
+st.subheader("Azərbaycanın ilk AI Hüquq Platforması")
+st.info("Haqqınızı rəsmi və qanuni yolla bərpa edin. Bütün müraciətlər anonimdir.")
 
-# 3. Sidebar - Sürücü Profili
+st.divider()
+
+# 3. Sol Panel - Sürücü Profili
 with st.sidebar:
-    st.title("👤 Sürücü Paneli")
-    name = st.text_input("Ad, Soyad:", placeholder="Əli Əliyev")
-    car_plate = st.text_input("Avtomobil nömrəsi:", placeholder="99-XX-000")
-    st.info("Profil məlumatlarınız rəsmi ərizəyə avtomatik əlavə olunacaq.")
+    st.header("👤 Sürücü Paneli")
+    name = st.text_input("Ad, Soyad:", placeholder="Məs: Əli Əliyev")
+    car_plate = st.text_input("Avtomobil nömrəsi:", placeholder="Məs: 99-XX-000")
+    st.write("---")
+    st.caption("Profil məlumatlarınız rəsmi sənəd üçün istifadə olunur.")
 
-# 4. Əsas Ekran
-st.markdown("<h1 class='main-title'>⚖️ Haqq.ai</h1>", unsafe_allow_value=True)
-st.write("---")
+# 4. Əsas Form
+st.write("### 📝 Şikayət Formu")
 
 col1, col2 = st.columns(2)
 
 with col1:
-    category = st.selectbox("Xətanın növü:", [
-        "Sürət həddinin aşılması (Maddə 327.1 - 328)",
-        "Qırmızı işıq / Stop nişanı (Maddə 327.2)",
-        "Dayanma, durma və parklanma (Maddə 346)",
-        "Yol nişanlarının tələblərinə əməl etməmə",
-        "Sərxoş vəziyyətdə idarəetmə (Maddə 333)"
+    # Bütün maddələrin siyahısını bura yığırıq
+    category = st.selectbox("Xəta maddəsini seçin:", [
+        "Maddə 327.1 (Sürət həddinin aşılması - 10-20 km/saat)",
+        "Maddə 328.1 (Sürət həddinin aşılması - 20-40 km/saat)",
+        "Maddə 327.2 (Qırmızı işıqdan keçmə)",
+        "Maddə 346.1 (Dayanma-durma qaydalarının pozulması)",
+        "Maddə 329.1 (Təhlükəsizlik kəmərindən istifadə etməmə)",
+        "Maddə 342.1.1 (Şüşələrə qanunsuz plyonka çəkilməsi)",
+        "Digər (Mətn hissəsində qeyd edin)"
     ])
 
 with col2:
-    date = st.date_input("Hadisə tarixi:")
+    event_date = st.date_input("Hadisə tarixi:")
 
-details = st.text_area("Hadisənin təfərrüatları (arqumentləriniz):", 
-                      placeholder="Məs: Nişan görünmürdü, radar xətası var idi...")
+# Sürücü məlumatlarını əlavə etmək üçün təkmil bölmə
+st.write("### 🔍 Hadisənin Təfərrüatları")
+details = st.text_area("Niyə cərimə ilə razı deyilsiniz?", 
+                      placeholder="Məsələn: Yol nişanı ağacların arxasında qaldığı üçün görünmürdü və ya radar xətası var idi...",
+                      height=150)
 
-if st.button("🚀 PREMİUM ƏRİZƏNİ HAZIRLA"):
-    if details and name and car_plate:
-        st.success("✅ Rəsmi ərizəniz Azərbaycan qanunvericiliyinə uyğun hazırlandı!")
-        
-        # Sənədin önbaxışı
-        doc_preview = f"""
-        AZƏRBAYCAN RESPUBLİKASI DAXİLİ İŞLƏR NAZİRLİYİ
-        DÖVLƏT YOL POLİSİ İDARƏSİNƏ
-        
-        Müraciət edən: {name}
-        Avtomobil nömrəsi: {car_plate}
-        
-        ŞİKAYƏT ƏRİZƏSİ
-        
-        Mən bildirirəm ki, {date} tarixində tərəfimə tətbiq olunmuş {category} üzrə cərimə ilə razı deyiləm. 
-        Səbəb: {details}
-        
-        Qanunvericiliyin tələblərinə əsasən işə yenidən baxılmasını xahiş edirəm.
-        """
-        st.text_area("Ərizə Mətni:", doc_preview, height=250)
-        st.download_button("📥 Sənədi Yüklə", doc_preview, file_name="haqq_ai_erize.txt")
-    else:
-        st.error("Xahiş olunur bütün xanaları (ad, nömrə, detal) doldurun.")
+# 5. Sənəd Yaradılması
+if st.button("🚀 RƏSMİ ƏRİZƏNİ HAZIRLA"):
+    if name and car_plate and details:
+        with st.spinner('AI Azərbaycan qanunvericilik bazasını analiz edir...'):
+            # Rəsmi Mətn Strukturunun yaradılması
+            erize_metni = f"""
+            AZƏRBAYCAN RESPUBLİKASI DAXİLİ İŞLƏR NAZİRLİYİ
+            BAKI ŞƏHƏR BAŞ POLİS İDARƏSİ DÖVLƏT YOL POLİSİ İDARƏSİNƏ
+            
+            Müraciət edən: {name}
+            Avtomobil nömrəsi: {car_plate}
+            Tarix: {event_date}
+            
+            ŞİKAYƏT ƏRİZƏSİ
+            
+            Bildirirəm ki, tərəfimə tətbiq olunmuş {category} üzrə inzibati xəta protokolu ilə razı deyiləm. 
+            
+            Əsaslandırma: {details}
+            
+            Azərbaycan Respublikasının İnzibati Xətalar Məcəlləsinin və "Vətəndaşların müraciətləri haqqında"
