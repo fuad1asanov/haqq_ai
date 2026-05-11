@@ -1,77 +1,57 @@
 import streamlit as st
+from datetime import datetime
 
-# 1. UI Ayarları
-st.set_page_config(page_title="Haqq.ai | Screenshot-to-Appeal", layout="centered")
+# 1. Səhifə Ayarları və Stil
+st.set_page_config(page_title="Haqq.ai | Hüquqi Müdafiə", layout="centered")
+
+# Stabil Dizayn (Python 3.14 üçün optimallaşdırılmış)
+st.markdown("""
+<style>
+    .stApp { background-color: #0E1117; }
+    .main-header { color: #00D4FF; text-align: center; font-size: 2.5rem; font-weight: bold; }
+    .legal-card { background-color: #1A1C24; padding: 20px; border-radius: 15px; border-left: 5px solid #00D4FF; margin-bottom: 20px; }
+    .stButton>button { background: linear-gradient(90deg, #00D4FF, #0055FF); color: white; border-radius: 8px; border: none; height: 50px; font-weight: bold; }
+</style>
+""", unsafe_allow_value=True)
 
 # 2. Başlıq
-st.title("⚖️ Haqq.ai")
-st.markdown("### Cərimə Skrinşotunu At, Şikayəti Hazırlayaq")
-st.info("SMS Radar və ya DYP-dən gələn cərimə bildirişinin şəklini yükləyin.")
-
+st.markdown("<div class='main-header'>⚖️ Haqq.ai</div>", unsafe_allow_value=True)
+st.markdown("<p style='text-align: center; color: #999;'>Süni İntellektlə Haqqınızı Bərpa Edin</p>", unsafe_allow_value=True)
 st.divider()
 
-# 3. Ağıllı Analiz Bölməsi
-st.write("### 📸 1. Şəkli Yükləyin")
-upload_type = st.radio("Yükləyəcəyiniz sənəd növü:", ["SMS Radar / Bildiriş Skrinşotu", "Texpasport Şəkli"])
-uploaded_img = st.file_uploader("Şəkli buraya yükləyin", type=['jpg', 'jpeg', 'png'])
+# 3. Addım-addım Məntiq (Wizard)
+step = st.radio("Mərhələni seçin:", ["1. Analiz (Skrinşot)", "2. Detallar və Sübutlar", "3. Rəsmi Sənəd"], horizontal=True)
 
-# Demo Məlumatlar (Analiz simulyasiyası)
-if uploaded_img:
-    with st.spinner('AI mətni analiz edir və detalları çıxarır...'):
-        st.success("✅ Məlumatlar tapıldı!")
-        if "SMS" in upload_type:
-            # Skrinşotdan gələn təxmini datalar
-            auto_name = "Sürücü" 
-            auto_plate = "99-UP-007"
-            auto_madda = "Maddə 328.1 (Sürət)"
-            auto_reason = "Radarda qeydə alınmış sürət həddi"
-        else:
-            auto_name = "Əliyev Vəli"
-            auto_plate = "77-AA-111"
-            auto_madda = "Seçilməyib"
-            auto_reason = ""
-else:
-    auto_name, auto_plate, auto_madda, auto_reason = "", "", "", ""
+if step == "1. Analiz (Skrinşot)":
+    st.markdown("### 📸 Cərimə Bildirişini Yükləyin")
+    st.write("SMS Radar və ya DYP skrinşotunu əlavə edin, AI detalları avtomatik çəksin.")
+    
+    uploaded_file = st.file_uploader("Şəkli seçin...", type=['png', 'jpg', 'jpeg'])
+    
+    if uploaded_file:
+        st.success("✅ Şəkil uğurla yükləndi!")
+        # Real OCR inteqrasiyasına qədər istifadəçi datanı təsdiq edir
+        st.info("AI Analiz Nəticəsi: 90-PY-161 | 346.4 (2-ci cərgə) | 80 AZN")
+        st.session_state['data_ready'] = True
 
-st.divider()
+elif step == "2. Detallar və Sübutlar":
+    st.markdown("### 🔍 Hüquqi Boşluqları Tapırıq")
+    
+    with st.expander("📝 Sürücü və Protokol Məlumatları", expanded=True):
+        full_name = st.text_input("Ad, Soyad, Ata adı:", placeholder="Həsənov Fuad Elmir")
+        protokol_no = st.text_input("Protokol nömrəsi:", placeholder="IXP7935495")
+        fine_amount = st.selectbox("Cərimə məbləği:", ["20 AZN", "40 AZN", "60 AZN", "80 AZN", "100 AZN+"])
 
-# 4. Dinamik Form
-st.write("### 📝 2. Məlumatları Təsdiqləyin")
-col1, col2 = st.columns(2)
-with col1:
-    name = st.text_input("Ad, Soyad:", value=auto_name)
-    category = st.text_input("Cərimə Maddəsi:", value=auto_madda)
-with col2:
-    plate = st.text_input("Nömrə:", value=auto_plate)
-    event_date = st.date_input("Hadisə tarixi:")
+    st.write("#### 🛡️ Müdafiə Strategiyası Seçin")
+    case_type = st.selectbox("Hadisə zamanı hansı hal baş vermişdi?", [
+        "Mən sükan arxasında idim və manevr edirdim (Məsləhət görülən)",
+        "Texniki nasazlıq / Məcburi dayanma",
+        "Yol nişanları / Nişanlanma görünmürdü",
+        "Zolağa sağa dönmək üçün daxil olmuşdum",
+        "Digər xüsusi vəziyyət"
+    ])
+    
+    extra_details = st.text_area("Hadisəni öz sözlərinizlə təsvir edin:", 
+                                placeholder="Məsələn: Polis yaxınlaşanda park etmək üçün boş yerə girməyə çalışırdım...")
 
-details = st.text_area("Etiraz səbəbiniz (Məs: Texniki xəta, nişan yoxluğu):", value=auto_reason)
-
-# 5. Ödəniş və Yükləmə Məntiqi
-if st.button("🚀 ŞİKAYƏT SƏNƏDİNİ GÖSTƏ"):
-    if name and plate and details:
-        st.markdown("---")
-        st.subheader("📄 Hazırlanmış Ərizə (Önbaxış)")
-        
-        preview_text = f"""AZƏRBAYCAN RESPUBLİKASI DYP-nə
-Müraciət edən: {name} ({plate})
-
-ŞİKAYƏT ƏRİZƏSİ
-
-Bildirirəm ki, {event_date} tarixində tərəfimə göndərilən {category} üzrə 
-cərimə bildirişi ilə razı deyiləm. Səbəb: {details}.
-
-İşə yenidən baxılmasını xahiş edirəm."""
-        
-        st.code(preview_text, language="text")
-        
-        # ÖDƏNİŞ TƏKLİFİ
-        st.warning("💰 **Sənədi yükləmək üçün cəmi 1 AZN ödəniş tələb olunur.**")
-        
-        if st.button("💳 İndi Ödə və Yüklə"):
-            st.info("Ödəniş sisteminə yönləndirilir... (Bu hissə real bank API-na qoşulacaq)")
-    else:
-        st.error("Zəhmət olmasa şəkli yükləyin və ya məlumatları tamamlayın.")
-
-st.divider()
-st.caption("Haqq.ai - Azərbaycanın ilk mobil hüquq köməkçisi.")
+    if st.button("H
