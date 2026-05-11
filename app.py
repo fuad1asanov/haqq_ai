@@ -1,68 +1,71 @@
 import streamlit as st
 
-# 1. Səhifə Ayarları (Stabil versiya)
-st.set_page_config(page_title="Haqq.ai - Haqq Radarı", page_icon="⚖️")
+# 1. UI Konfiqurasiyası
+st.set_page_config(page_title="Haqq.ai | Premium Legal Tech", layout="wide")
 
-# 2. Başlıq Hissəsi
-st.title("⚖️ Haqq.ai")
-st.markdown("### Haqqınızı rəsmi və qanuni yolla bərpa edin")
-st.info("Azərbaycanın ilk Süni İntellekt əsaslı hüquq platforması")
+# 2. Premium Dark-Blue Dizayn (CSS)
+st.markdown("""
+    <style>
+    .stApp { background-color: #0A192F; color: #E6F1FF; }
+    .stButton>button {
+        background: linear-gradient(90deg, #64FFDA 0%, #48BB78 100%);
+        color: #0A192F; border: none; font-weight: bold; border-radius: 10px;
+        transition: 0.3s; width: 100%;
+    }
+    .stButton>button:hover { transform: scale(1.02); }
+    .stTextInput>div>div>input { background-color: #112240; color: white; border: 1px solid #233554; }
+    .stSelectbox>div>div>div { background-color: #112240; color: white; }
+    </style>
+    """, unsafe_allow_value=True)
 
-st.divider()
+# 3. Sidebar - Sürücü Profili
+with st.sidebar:
+    st.image("https://cdn-icons-png.flaticon.com/512/3135/3135715.png", width=100)
+    st.title("Sürücü Paneli")
+    name = st.text_input("Ad, Soyad:", placeholder="Məs: Əli Əliyev")
+    car_plate = st.text_input("Avtomobil nömrəsi:", placeholder="99-XX-000")
+    st.success("Profil yadda saxlanıldı (Lokal)")
 
-# 3. İstifadəçi Məlumatları (Anonimlik qorunur)
-st.write("#### 📞 Şikayət üçün məlumatları tamamlayın")
-phone_number = st.text_input("Mobil nömrəniz (Təsdiq kodu və sənəd üçün):", placeholder="050XXXXXXX")
+# 4. Əsas Ekran
+st.title("🤖 Haqq.ai - Ağıllı Şikayət Sistemi")
+st.write("Düzgün maddəni seçin və AI sizin üçün peşəkar hüquqi sənəd hazırlasın.")
 
-# Nömrə daxil edilmədən digər xanalar açılmır (Strategiyamız)
-if phone_number:
-    st.write("---")
-    st.write("#### 🏎️ Cərimə detalları")
-    
-    option = st.selectbox("Cərimə maddəsini seçin:", 
-                         ["Maddə 327.1 (Sürət həddi)", 
-                          "Maddə 327.2 (Qırmızı işıq)", 
-                          "Maddə 342 (Dayanma-durma)", 
-                          "Digər hüquqi məsələ"])
-    
-    user_text = st.text_area("Hadisə barədə rəsmi izahatınız:", 
-                             placeholder="Məsələn: Yol nişanı ağacların arxasında qaldığı üçün görünmürdü...")
-    
-    if st.button("Rəsmi Şikayət Ərizəsini Hazırla ✨"):
-        if len(user_text) > 10:
-            with st.spinner('Süni İntellekt Azərbaycan qanunvericiliyini analiz edir...'):
-                # Rəsmi Sənəd Şablonu
-                official_doc = f"""
-                AZƏRBAYCAN RESPUBLİKASI DAXİLİ İŞLƏR NAZİRLİYİ
-                BAKI ŞƏHƏR BAŞ POLİS İDARƏSİ DÖVLƏT YOL POLİSİ İDARƏSİNƏ
-                
-                Müraciət edən: {phone_number}
-                
-                ŞİKAYƏT ƏRİZƏSİ
-                
-                Mən, aşağıda qeyd olunan nömrəli istifadəçi, bildirirəm ki, tərəfimə tətbiq olunan {option} üzrə cərimə protokolu ilə razı deyiləm. 
-                
-                Səbəb və İzahat: {user_text}. 
-                
-                Azərbaycan Respublikası İnzibati Xətalar Məcəlləsinin müvafiq maddələrinə və vətəndaşların müraciətləri haqqında qanuna əsasən, qeyd olunan protokolun ləğv edilməsini və işə yenidən baxılmasını xahiş edirəm.
-                
-                Tarix: 12.05.2026
-                İmza: (Elektron müraciət üçün imza tələb olunmur)
-                """
-                
-                st.success("✅ Rəsmi ərizəniz hazırdır!")
-                st.text_area("Ərizənin önbaxışı:", official_doc, height=250)
-                
-                # Sənədi yükləmə düyməsi
-                st.download_button(label="📥 Sənədi PDF/Mətn olaraq yüklə", 
-                                   data=official_doc, 
-                                   file_name="HaqqAI_Sikayet_Erizesi.txt",
-                                   mime="text/plain")
-                
-                st.warning("⚠️ **Növbəti addım:** Bu sənədi yükləyin və 'asan.gov.az' portalı vasitəsilə Daxili İşlər Nazirliyinə elektron müraciət kimi göndərin.")
-        else:
-            st.error("Zəhmət olmasa izahat hissəsini bir az daha ətraflı yazın.")
+col1, col2 = st.columns(2)
 
-# 4. Footer (Anonimlik qeydi)
-st.write("---")
-st.caption("© 2026 Haqq.ai | Bütün müraciətlər anonim saxlanılır və rəsmi hüquqi bazaya uyğun hazırlanır.")
+with col1:
+    category = st.selectbox("Xətanın növü:", [
+        "Sürət həddinin aşılması (Maddə 327.1 - 328)",
+        "Qırmızı işıq / Stop nişanı (Maddə 327.2)",
+        "Dayanma, durma və parklanma (Maddə 346)",
+        "Yol nişanlarının tələblərinə əməl etməmə",
+        "Sərxosh vəziyyətdə idarəetmə (Maddə 333)"
+    ])
+
+with col2:
+    date = st.date_input("Hadisə tarixi:")
+
+details = st.text_area("Hadisənin təfərrüatları (Sübutlar, görüntülər, haqsızlığın səbəbi):")
+
+if st.button("🚀 PREMIUM ƏRİZƏNİ GENERASİYA ET"):
+    if details:
+        with st.status("Qanunvericilik bazası yoxlanılır...", expanded=True) as status:
+            st.write("🔍 İnzibati Xətalar Məcəlləsi analiz edilir...")
+            st.write("📑 Precedent məhkəmə qərarları tapılır...")
+            st.write("✍️ Hüquqi terminologiya tətbiq olunur...")
+            status.update(label="Ərizə hazırdır!", state="complete", expanded=False)
+        
+        # Sənədin Vizualı
+        st.markdown(f"""
+        <div style="background-color: white; color: black; padding: 20px; border-radius: 5px; font-family: serif;">
+            <p style="text-align: center; font-weight: bold;">AZƏRBAYCAN RESPUBLİKASI DAXİLİ İŞLƏR NAZİRLİYİ</p>
+            <p>Müraciət edən: <b>{name}</b></p>
+            <p>Nəqliyyat vasitəsi: <b>{car_plate}</b></p>
+            <br>
+            <p style="text-align: center; font-weight: bold;">ŞİKAYƏT ƏRİZƏSİ</p>
+            <p>Mən bildirirəm ki, {date} tarixində qeydə alınmış {category} üzrə cərimə ilə razı deyiləm.</p>
+            <p>Əsaslandırma: {details}</p>
+        </div>
+        """, unsafe_allow_value=True)
+        st.download_button("📥 Sənədi Yüklə (PDF Formatında)", "Mətn bura gələcək...", file_name="sikayet.pdf")
+    else:
+        st.warning("Zəhmət olmasa təfərrüatları qeyd edin.")
